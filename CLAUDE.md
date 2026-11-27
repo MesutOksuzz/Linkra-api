@@ -289,3 +289,35 @@ Yeni projede hocanınki örnek alınırsa bunlar yine geçerli:
 3. Bildiğim konuları yeniden uzun uzun anlatma; yeni kavramları (özellikle Clean Architecture, test)
    OTS'deki karşılığıyla bağlantı kurarak anlat.
 4. Kodu vermeden önce derle/çalıştır; emin olmadığın yeri söyle.
+
+---
+
+# Linkra — Proje kararları (27 Kasım 2026)
+
+Kaynak: "Jira Benzeri Proje Yönetim Sistemi — Yazılım Sistem Gereksinimleri Raporu" v1.0 (3 Kasım 2026) → `docs/gereksinimler.md` (asıl belge: `docs/Linkra_Gereksinim_Dokumani_v1.0.docx`).
+Teknoloji: .NET 10, Clean Architecture, PostgreSQL (Npgsql), EF Core Code First, Docker Compose, Angular. Otomatik test teslimi yok.
+`MesutOksuzz/pk-ots` sadece okunur kaynaktır; oraya yazılmaz, commit/push yapılmaz.
+
+## Verilen kararlar
+
+| # | Konu | Karar | Not / açık kalan |
+|---|---|---|---|
+| 1 | Çıkış (FR-003) | Oturum sonlandırılır; **refresh token** kullanılır, çıkışta iptal edilir | Kısa ömürlü access token + DB'de saklanan refresh token |
+| 2 | "Yetkili kullanıcı" (FR-012/018/037) | Owner her şeyi yapar; Owner yetki verirse Member da yapabilir | Kapsam dışı "dinamik rol/izin" olmaması için sabit yetki bayrağı (örn. `WorkspaceMember` üzerinde) düşünülecek. Hangi işlemleri kapsadığı netleşecek |
+| 3 | Proje kodu (FR-015) | Kullanıcı kendisi belirler ve yönetir | Benzersizlik: workspace içinde mi, global mi? Kod değişince görev kodları (`LNK-12`) ne olacak? |
+| 4 | Kanban kapsamı | Projedeki **tüm** görevler gösterilir (sprint'e bakılmaz) | |
+| 5 | Görünürlük | Backlog'da Epic dahil hepsi; Kanban'da sadece task'lar | "Task" = sadece Task türü mü, Epic hariç hepsi mi? netleşecek |
+| 6 | Sprint kapanışı (FR-043) | Ertelendi (acelesi yok) | Hafta 4'te karar |
+| 7 | Üye ekleme (FR-009) | Mevcut kullanıcı e-posta ile bulunup eklenir | Davet sistemi yok |
+| 8 | Repo yapısı | **Mono repo**: backend + Angular aynı repoda (`Linkra-api`) | Klasör düzeni kurulumda belirlenecek |
+| 9 | Şifre saklama | **Argon2** (Argon2id) | Paket seçimi kurulumda doğrulanacak |
+| 10 | Paketler | Bilinen yöntem: MediatR 12.5.0, AutoMapper 12.0.0 (OTS ile aynı) | FluentValidation **yeni kayıt şekli** (`AddValidatorsFromAssembly...`, eski `AddFluentValidation` yok) |
+
+Açık kalan sorular Mesut tarafından yöneticiye sorulacak.
+
+## Mimari (ilk öneri)
+
+`Linkra.Domain` → `Linkra.Application` → `Linkra.Infrastructure` / `Linkra.Api`.
+Bağımlılık kuralı: Api → Application ← Infrastructure; Application → Domain; Domain hiçbir şeye bağımlı değil.
+Entity taslağı: `User`, `Workspace`, `WorkspaceMember`, `Project`, `WorkItem` (Type/Priority/Status, `ParentId` self-reference,
+`AssigneeId`, `SprintId` null = Backlog), `Sprint`, `RefreshToken`.
