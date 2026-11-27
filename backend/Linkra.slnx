@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Linkra.Api/Linkra.Api.csproj" />
+    <Project Path="src/Linkra.Application/Linkra.Application.csproj" />
+    <Project Path="src/Linkra.Domain/Linkra.Domain.csproj" />
+    <Project Path="src/Linkra.Infrastructure/Linkra.Infrastructure.csproj" />
+  </Folder>
+</Solution>
